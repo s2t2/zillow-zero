@@ -16,6 +16,10 @@ load_dotenv()
 CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH", default="/usr/local/bin/chromedriver") # get yours with `which chromedriver`
 HOME_URL = os.getenv("HOME_URL") # https://www.zillow.com/homedetails/<ADDRESS-TEXT>/<ZPID>_zpid/
 
+def clean_str(mystr):
+    # h/t: https://stackoverflow.com/questions/10993612/how-to-remove-xa0-from-string-in-python
+    return mystr.replace(u'\xa0', u' ')
+
 if __name__ == "__main__":
 
     print("HOME URL:", HOME_URL)
@@ -34,5 +38,21 @@ if __name__ == "__main__":
 
     soup = BeautifulSoup(driver.page_source, features="html.parser")
 
-    address = soup.find("h1", "ds-address-container").text.replace(u'\xa0', u' ') # h/t: https://stackoverflow.com/questions/10993612/how-to-remove-xa0-from-string-in-python
-    print("ADDRESS:", address)
+    address = soup.find("h1", "ds-address-container").text
+    print("ADDRESS:", clean_str(address))
+
+    price = soup.find("h3", "ds-price").text
+    print("LIST PRICE:", clean_str(price))
+
+    #details = soup.find("h3", "ds-bed-bath-living-area-container").text
+    #print("DETAILS STR  ", clean_str(details))
+    #beds = details.split(" | ")
+    #baths =
+    #sqft =
+
+    details = soup.find("h3", "ds-bed-bath-living-area-container").find_all("span", "ds-bed-bath-living-area")
+    details = [d.text for d in details] #> ['1 bd', '1 ba', '788 Square Feet']
+    #bd, ba, sqft = details
+    bd = int([detail.replace(" bd", "") for detail in details if "bd" in detail][0])
+    ba = int([detail.replace(" ba", "") for detail in details if "ba" in detail][0])
+    sqft = int([detail.replace(" Square Feet", "") for detail in details if "Square Feet" in detail][0])
