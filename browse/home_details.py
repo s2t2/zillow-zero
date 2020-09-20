@@ -27,10 +27,10 @@ if __name__ == "__main__":
 
     driver = webdriver.Chrome(CHROMEDRIVER_PATH)
     # ... OR IN "HEADLESS MODE"...
-    # options = webdriver.ChromeOptions()
-    # options.add_argument('--incognito')
-    # options.add_argument('--headless')
-    # driver = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
+    #options = webdriver.ChromeOptions()
+    #options.add_argument('--incognito')
+    #options.add_argument('--headless')
+    #driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
 
     driver.get(HOME_URL)
     print(driver.title) #>
@@ -42,17 +42,30 @@ if __name__ == "__main__":
     print("ADDRESS:", clean_str(address))
 
     price = soup.find("h3", "ds-price").text
-    print("LIST PRICE:", clean_str(price))
-
-    #details = soup.find("h3", "ds-bed-bath-living-area-container").text
-    #print("DETAILS STR  ", clean_str(details))
-    #beds = details.split(" | ")
-    #baths =
-    #sqft =
+    print("LIST PRICE:", price)
+    price = int(price.replace("$","").replace(",",""))
 
     details = soup.find("h3", "ds-bed-bath-living-area-container").find_all("span", "ds-bed-bath-living-area")
     details = [d.text for d in details] #> ['1 bd', '1 ba', '788 Square Feet']
-    #bd, ba, sqft = details
+    print(details)
     bd = int([detail.replace(" bd", "") for detail in details if "bd" in detail][0])
     ba = int([detail.replace(" ba", "") for detail in details if "ba" in detail][0])
     sqft = int([detail.replace(" Square Feet", "") for detail in details if "Square Feet" in detail][0])
+    #print(bd, "BD", ba, "BA |", sqft, "SQFT")
+
+    status = soup.find("span", "ds-status-details").text
+    print("STATUS:", status) #> 'Contingent'
+
+    #z_price = soup.find("div", "ds-chip-removable-content").text
+    #z_price = int(z_price.strip().split("$")[1].replace(",", ""))
+    #print("Z PRICE", z_price)
+
+    # to get full desc, need to first click the "Read more" button in the "ds-overview-section"
+    desc = soup.find("div", "ds-overview-section").text
+    print("DESC:", desc)
+
+    facts = soup.find("ul", "ds-home-fact-list").find_all("li", "ds-home-fact-list-item")
+    print("FACTS:", facts) #> ['Type:Condo', 'Year built:1890', 'Heating:Forced air, Gas', 'Cooling:Central', 'Parking:No Data', 'HOA:$218/mo', 'Price/sqft:$235']
+    hoa = [fact.text for fact in facts if "HOA:" in fact.text][0] #> 'HOA:$218/mo'
+    hoa = int(hoa.split("$")[1].split("/")[0])
+    print("HOA:", hoa)
