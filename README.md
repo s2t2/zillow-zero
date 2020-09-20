@@ -12,5 +12,5 @@ pip install -r requirements.txt
 ## Usage
 
 ```sh
-URL="_____" python -m scrape.home_details
+HOME_URL="_____" python -m browse.home_details
 ```

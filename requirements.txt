@@ -4,6 +4,7 @@
 python-dotenv
 
 requests
+selenium
 beautifulsoup4
 
 pandas
